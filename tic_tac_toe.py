@@ -13,11 +13,7 @@ class Board:
         self.board_size = board_size
         self.fields = {}
 
-        i = 1
-        for y in range(self.board_size):
-            for x in range(self.board_size):
-                self.fields[x, y] = str(i)
-                i += 1
+        self.fields = [['' for x in range(self.board_size)] for y in range(self.board_size)]
 
         if other:
             self.__dict__ = deepcopy(other.__dict__)
@@ -33,8 +29,11 @@ class Gui:
         window = QWidget()
         layout = QGridLayout(window)
 
-        for x, y in self.board.fields:
-            layout.addWidget(QPushButton(self.board.fields[x, y]), x, y)
+        for x in range(self.board.board_size):
+            for y in range(self.board.board_size):
+                button = QPushButton(self.board.fields[x][y])
+                button.clicked.connect(lambda _, x = x, y = y: print(str(x) + ', ' + str(y)))
+                layout.addWidget(button, x, y)
 
         window.show()
         app.exec_()
