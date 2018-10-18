@@ -1,5 +1,4 @@
-from PyQt5.QtWidgets import QApplication, QWidget, QGridLayout, QPushButton
-
+from PyQt5.QtWidgets import *
 from board import Board
 
 
@@ -25,7 +24,8 @@ class Gui:
         for x in range(self.board.board_size):
             for y in range(self.board.board_size):
                 field_content = self.board.fields[x][y]
-                button = QPushButton(field_content)
+                button = QToolButton()
+                button.setText(field_content)
                 button.setDisabled(field_content != '')
                 button.clicked.connect(lambda _, x=x, y=y: self.click_handler(x, y))
                 self.layout.addWidget(button, x, y)
