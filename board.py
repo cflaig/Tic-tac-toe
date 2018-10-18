@@ -21,6 +21,7 @@ class Board:
 
         self.fields = [['' for _ in range(self.board_size)] for _ in range(self.board_size)]
 
+
     def move(self, x, y):
         self.previous_state = deepcopy(self)
         self.fields[x][y] = self.first_player if self.is_first_player else self.second_player
