@@ -21,14 +21,12 @@ class Gui:
         window.show()
         app.exec()
 
-
     def _create_buttons(self):
         for x in range(self.board.board_size):
             for y in range(self.board.board_size):
                 field_content = self.board.fields[x][y]
                 handler = lambda _, x=x, y=y: self.click_handler(x, y)
                 self.layout.addWidget(self._create_button(field_content, handler), x, y)
-
 
     @staticmethod
     def _create_button(field_content: str, handler: Callable[[bool], None]) -> QWidget:
@@ -38,7 +36,6 @@ class Gui:
         button.setDisabled(field_content != '')
         button.clicked.connect(handler)
         return button
-
 
     def click_handler(self, x, y):
         self.board.move(x, y)
