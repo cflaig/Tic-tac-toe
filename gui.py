@@ -26,7 +26,7 @@ class Gui:
             for y in range(self.board.board_size):
                 field_content = self.board.fields[x][y]
                 handler = lambda _, x=x, y=y: self.click_handler(x, y)
-                self.layout.addWidget(self._create_button(field_content, handler), x, y)
+                self._layout.addWidget(self._create_button(field_content, handler), x, y)
 
     @staticmethod
     def _create_button(field_content: str, handler: Callable[[bool], None]) -> QWidget:
