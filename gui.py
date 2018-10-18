@@ -1,11 +1,14 @@
 from PyQt5.QtWidgets import QApplication, QWidget, QGridLayout, QPushButton
 
+from board import Board
+
 
 class Gui:
 
+    board: Board
     layout: QGridLayout
 
-    def __init__(self, board):
+    def __init__(self, board: Board):
         self.board = board
 
     def show(self):
@@ -13,12 +16,12 @@ class Gui:
         window = QWidget()
         window.setWindowTitle('Tic tac toe')
         self.layout = QGridLayout(window)
-        self.create_buttons()
+        self._create_buttons()
 
         window.show()
         app.exec()
 
-    def create_buttons(self):
+    def _create_buttons(self):
         for x in range(self.board.board_size):
             for y in range(self.board.board_size):
                 field_content = self.board.fields[x][y]
@@ -29,4 +32,4 @@ class Gui:
 
     def click_handler(self, x, y):
         self.board.move(x, y)
-        self.create_buttons()
+        self._create_buttons()
