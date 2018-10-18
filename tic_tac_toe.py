@@ -13,7 +13,7 @@ class Board:
         self.board_size = board_size
         self.fields = {}
 
-        self.fields = [['' for x in range(self.board_size)] for y in range(self.board_size)]
+        self.fields = [['' for _ in range(self.board_size)] for _ in range(self.board_size)]
 
         if other:
             self.__dict__ = deepcopy(other.__dict__)
@@ -27,6 +27,7 @@ class Gui:
     def show(self):
         app = QApplication([])
         window = QWidget()
+        window.setWindowTitle('Tic tac toe')
         layout = QGridLayout(window)
 
         for x in range(self.board.board_size):
@@ -36,7 +37,7 @@ class Gui:
                 layout.addWidget(button, x, y)
 
         window.show()
-        app.exec_()
+        app.exec()
 
 
 if __name__ == '__main__':
