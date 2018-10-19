@@ -25,8 +25,8 @@ class Gui:
         for x in range(self.board.board_size):
             for y in range(self.board.board_size):
                 field_content = self.board.fields[x][y]
-                handler = lambda _, x=x, y=y: self.click_handler(x, y)
-                self._layout.addWidget(self._create_button(field_content, handler), x, y)
+                button = self._create_button(field_content, lambda _, x=x, y=y: self.click_handler(x, y))
+                self._layout.addWidget(button, x, y)
 
     def _update_buttons(self):
         for x in range(self.board.board_size):
