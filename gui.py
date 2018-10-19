@@ -28,6 +28,14 @@ class Gui:
                 handler = lambda _, x=x, y=y: self.click_handler(x, y)
                 self._layout.addWidget(self._create_button(field_content, handler), x, y)
 
+    def _update_buttons(self):
+        for x in range(self.board.board_size):
+            for y in range(self.board.board_size):
+                field_content = self.board.fields[x][y]
+                button = self._layout.itemAtPosition(x, y).widget()
+                button.setText(field_content)
+                button.setDisabled(field_content != '')
+
     @staticmethod
     def _create_button(field_content: str, handler: Callable[[bool], None]) -> QWidget:
         button = QToolButton()
@@ -39,4 +47,4 @@ class Gui:
 
     def click_handler(self, x, y):
         self.board.move(x, y)
-        self._create_buttons()
+        self._update_buttons()
