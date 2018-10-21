@@ -1,5 +1,5 @@
 from copy import deepcopy
-from typing import List
+from typing import List, Tuple
 
 
 class Board:
@@ -33,12 +33,10 @@ class Board:
         vertical = self.count_symbol(x, y, -1, 0, symbol) + self.count_symbol(x, y, 1, 0, symbol) - 1
         horizontal = self.count_symbol(x, y, 0, -1, symbol) + self.count_symbol(x, y, 0, 1, symbol) - 1
 
-        print('#############################')
-        print('Down right: ' + str(down_right_count))
-        print('Down left: ' + str(down_left_count))
-        print('Horizontal: ' + str(horizontal))
-        print('Vertical: ' + str(vertical))
-        return 0
+        return 100000 if max(down_right_count, down_left_count, vertical, horizontal) == self.required_for_winning else 0
+
+    def possible_moves(self) -> List[Tuple[int, int]]:
+        return [(x, y) for x in range(self.board_size) for y in range(self.board_size) if self.fields[x][y] == '']
 
     def count_symbol(self, x: int, y: int, x_step: int, y_step: int, symbol: str):
         count: int = 0
