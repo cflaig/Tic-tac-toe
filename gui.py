@@ -46,5 +46,5 @@ class Gui:
         return button
 
     def click_handler(self, x, y):
-        self.board.move(x, y)
+        self.board = self.board.move(x, y)
         self._update_buttons()

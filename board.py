@@ -10,7 +10,6 @@ class Board:
     board_size: int
     fields: List[List[str]]
     is_first_player: bool
-    previous_state: 'Board'
 
     def __init__(self, first_player: str, second_player: str, board_size: int = 3, required_for_winning: int = 3):
         self.first_player = first_player
@@ -22,6 +21,7 @@ class Board:
         self.fields = [['' for _ in range(self.board_size)] for _ in range(self.board_size)]
 
     def move(self, x, y):
-        self.previous_state = deepcopy(self)
-        self.fields[x][y] = self.first_player if self.is_first_player else self.second_player
-        self.is_first_player = not self.is_first_player
+        new_board: Board = deepcopy(self)
+        new_board.fields[x][y] = new_board.first_player if new_board.is_first_player else new_board.second_player
+        new_board.is_first_player = not new_board.is_first_player
+        return new_board
