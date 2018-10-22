@@ -70,17 +70,17 @@ class Board:
 
 def negamax(node) -> Tuple[int, Any]:
     possible_moves: List = node.possible_moves()
-    score = -node.score()
+    score = node.score()
 
-    if not possible_moves or score == -WON:
+    if not possible_moves or score == WON:
         return score, None
 
-    best = (-WON, None)
+    best = WON, None
     for move in possible_moves:
         node.move(move)
         value = -negamax(node)[0]
 
-        if value > best[0]:
+        if value < best[0]:
             best = value, move
 
         node.unmove()
