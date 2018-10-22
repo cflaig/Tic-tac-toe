@@ -36,15 +36,18 @@ class Board:
     def switch_player(self):
         self.is_first_player = not self.is_first_player
 
-    def score(self, move: Tuple[int, int]) -> int:
-        x, y = move
+    def score(self) -> int:
+        if not self.past_moves:
+            return 0
+
+        x, y = self.past_moves[-1]
         symbol = self.fields[x][y]
         down_right_count = self.count_symbol(x, y, -1, -1, symbol) + self.count_symbol(x, y, 1, 1, symbol) - 1
         down_left_count = self.count_symbol(x, y, 1, -1, symbol) + self.count_symbol(x, y, -1, 1, symbol) - 1
         vertical = self.count_symbol(x, y, -1, 0, symbol) + self.count_symbol(x, y, 1, 0, symbol) - 1
         horizontal = self.count_symbol(x, y, 0, -1, symbol) + self.count_symbol(x, y, 0, 1, symbol) - 1
 
-        return WON if max(down_right_count, down_left_count, vertical, horizontal) == self.required_for_winning else 0
+        return WON if max(down_right_count, down_left_count, vertical, horizontal) >= self.required_for_winning else 0
 
     def possible_moves(self) -> List[Tuple[int, int]]:
         return [(x, y) for x in range(self.board_size) for y in range(self.board_size) if self.fields[x][y] == '']
@@ -65,22 +68,25 @@ class Board:
             self.move(move)
 
 
-def negamax(node, move=None) -> Tuple[int, Any]:
+def negamax(node) -> Tuple[int, Any]:
     possible_moves: List = node.possible_moves()
 
-    if not move is None:
-        score = -node.score(move)
-
-        if not possible_moves or score == -WON:
-            return score, None
+    if not possible_moves:
+        return 0, None
 
     best: Tuple[int, Any] = (-WON, None)
     for move in possible_moves:
         node.move(move)
-        value = -negamax(node, move)[0]
+        score = node.score()
+
+        if score == WON:
+            node.unmove()
+            return score, move
+
+        value = -negamax(node)[0]
 
         if value > best[0]:
-            best = (value, move)
+            best = value, move
 
         node.unmove()
 
