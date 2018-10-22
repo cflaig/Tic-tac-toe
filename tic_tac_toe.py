@@ -2,7 +2,7 @@ from board import Board
 from gui import Gui
 
 
-BOARD_SIZE = 4
+BOARD_SIZE = 3
 REQUIRED_FOR_WINNING = 3
 
 if __name__ == '__main__':

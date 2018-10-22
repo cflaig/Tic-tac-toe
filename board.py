@@ -1,5 +1,7 @@
-from copy import deepcopy
-from typing import List, Tuple
+from typing import List, Tuple, Any
+
+
+WON: int = 100000
 
 
 class Board:
@@ -10,30 +12,40 @@ class Board:
     board_size: int
     fields: List[List[str]]
     is_first_player: bool
+    past_moves: List[Tuple[int, int]]
 
     def __init__(self, first_player: str, second_player: str, board_size: int = 3, required_for_winning: int = 3):
         self.first_player = first_player
         self.second_player = second_player
         self.required_for_winning = required_for_winning
         self.board_size = board_size
-        self.is_first_player = True
         self.fields = [['' for _ in range(self.board_size + 1)] for _ in range(self.board_size + 1)]
+        self.is_first_player = True
+        self.past_moves = []
 
-    def move(self, x: int, y: int):
-        new_board: Board = deepcopy(self)
-        new_board.fields[x][y] = new_board.first_player if new_board.is_first_player else new_board.second_player
-        new_board.is_first_player = not new_board.is_first_player
-        new_board.score(x, y)
-        return new_board
+    def move(self, move: Tuple[int, int]) -> None:
+        self.fields[move[0]][move[1]] = self.first_player if self.is_first_player else self.second_player
+        self.switch_player()
+        self.past_moves.append(move)
 
-    def score(self, x: int, y: int) -> int:
+    def unmove(self):
+        x, y = self.past_moves.pop()
+        self.fields[x][y] = ''
+        self.switch_player()
+
+    def switch_player(self):
+        self.is_first_player = not self.is_first_player
+
+    def score(self, move: Tuple[int, int]) -> int:
+        x, y = move
         symbol = self.fields[x][y]
         down_right_count = self.count_symbol(x, y, -1, -1, symbol) + self.count_symbol(x, y, 1, 1, symbol) - 1
         down_left_count = self.count_symbol(x, y, 1, -1, symbol) + self.count_symbol(x, y, -1, 1, symbol) - 1
         vertical = self.count_symbol(x, y, -1, 0, symbol) + self.count_symbol(x, y, 1, 0, symbol) - 1
         horizontal = self.count_symbol(x, y, 0, -1, symbol) + self.count_symbol(x, y, 0, 1, symbol) - 1
 
-        return 100000 if max(down_right_count, down_left_count, vertical, horizontal) == self.required_for_winning else 0
+        value = WON if max(down_right_count, down_left_count, vertical, horizontal) == self.required_for_winning else 0
+        return -value if self.is_first_player else value
 
     def possible_moves(self) -> List[Tuple[int, int]]:
         return [(x, y) for x in range(self.board_size) for y in range(self.board_size) if self.fields[x][y] == '']
@@ -47,3 +59,30 @@ class Board:
             y += y_step
 
         return count
+
+    def cpu_move(self):
+        move = negamax(self, 1)[1]
+        if not move is None:
+            self.move(move)
+
+
+def negamax(node, color: int, move=None) -> Tuple[int, Any]:
+    possible_moves: List = node.possible_moves()
+
+    if not move is None:
+        score: int = node.score(move)
+
+        if not possible_moves or score == WON:
+            return score * color, None
+
+    best: Tuple[int, Any] = (-WON, None)
+    for move in possible_moves:
+        node.move(move)
+        value = -negamax(node, -color, move)[0]
+
+        if value > best[0]:
+            best = (value, move)
+
+        node.unmove()
+
+    return best
