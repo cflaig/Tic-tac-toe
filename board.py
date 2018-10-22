@@ -44,7 +44,7 @@ class Board:
         vertical = self.count_symbol(x, y, -1, 0, symbol) + self.count_symbol(x, y, 1, 0, symbol) - 1
         horizontal = self.count_symbol(x, y, 0, -1, symbol) + self.count_symbol(x, y, 0, 1, symbol) - 1
 
-        return WON if max(down_right_count, down_left_count, vertical, horizontal) == self.required_for_winning else 0
+        return WON if max(down_right_count, down_left_count, vertical, horizontal) >= self.required_for_winning else 0
 
     def possible_moves(self) -> List[Tuple[int, int]]:
         return [(x, y) for x in range(self.board_size) for y in range(self.board_size) if self.fields[x][y] == '']
