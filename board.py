@@ -44,8 +44,7 @@ class Board:
         vertical = self.count_symbol(x, y, -1, 0, symbol) + self.count_symbol(x, y, 1, 0, symbol) - 1
         horizontal = self.count_symbol(x, y, 0, -1, symbol) + self.count_symbol(x, y, 0, 1, symbol) - 1
 
-        value = WON if max(down_right_count, down_left_count, vertical, horizontal) == self.required_for_winning else 0
-        return -value if self.is_first_player else value
+        return WON if max(down_right_count, down_left_count, vertical, horizontal) == self.required_for_winning else 0
 
     def possible_moves(self) -> List[Tuple[int, int]]:
         return [(x, y) for x in range(self.board_size) for y in range(self.board_size) if self.fields[x][y] == '']
@@ -61,24 +60,24 @@ class Board:
         return count
 
     def cpu_move(self):
-        move = negamax(self, -1)[1]
+        move = negamax(self)[1]
         if not move is None:
             self.move(move)
 
 
-def negamax(node, color: int, move=None) -> Tuple[int, Any]:
+def negamax(node, move=None) -> Tuple[int, Any]:
     possible_moves: List = node.possible_moves()
 
     if not move is None:
-        score: int = node.score(move)
+        score = -node.score(move)
 
-        if not possible_moves or score == WON or score == -WON:
-            return score * color, None
+        if not possible_moves or score == -WON:
+            return score, None
 
     best: Tuple[int, Any] = (-WON, None)
     for move in possible_moves:
         node.move(move)
-        value = -negamax(node, -color, move)[0]
+        value = -negamax(node, move)[0]
 
         if value > best[0]:
             best = (value, move)
