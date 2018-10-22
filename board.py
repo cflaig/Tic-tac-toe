@@ -61,7 +61,7 @@ class Board:
         return count
 
     def cpu_move(self):
-        move = negamax(self, 1)[1]
+        move = negamax(self, -1)[1]
         if not move is None:
             self.move(move)
 
@@ -72,7 +72,7 @@ def negamax(node, color: int, move=None) -> Tuple[int, Any]:
     if not move is None:
         score: int = node.score(move)
 
-        if not possible_moves or score == WON:
+        if not possible_moves or score == WON or score == -WON:
             return score * color, None
 
     best: Tuple[int, Any] = (-WON, None)
