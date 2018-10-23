@@ -63,12 +63,12 @@ class Board:
         return count
 
     def cpu_move(self):
-        move = negamax(self)[1]
+        move = negamax(self, WON, -WON)[1]
         if not move is None:
             self.move(move)
 
 
-def negamax(node) -> Tuple[int, Any]:
+def negamax(node, alpha, beta) -> Tuple[int, Any]:
     possible_moves: List = node.possible_moves()
     score = node.score()
 
@@ -78,11 +78,15 @@ def negamax(node) -> Tuple[int, Any]:
     best = WON, None
     for move in possible_moves:
         node.move(move)
-        value = -negamax(node)[0]
+        value = -negamax(node, -beta, -alpha)[0]
+        node.unmove()
 
         if value < best[0]:
             best = value, move
 
-        node.unmove()
+        alpha = min(alpha, value)
+
+        if alpha <= beta:
+            break
 
     return best
