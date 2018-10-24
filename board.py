@@ -1,6 +1,5 @@
 from typing import List, Tuple, Any
 
-PRIME = (2 ** 19 - 1)
 
 WON: int = 100000
 INF: int = 9 * WON
@@ -26,7 +25,7 @@ class Board:
         self.fields = [['' for _ in range(self.board_size + 1)] for _ in range(self.board_size + 1)]
         self.is_first_player = True
         self.past_moves = []
-        self.transposition_table = [None for _ in range(PRIME)]
+        self.transposition_table = [None for _ in range(3**(self.board_size**2))]
 
     def move(self, move: Tuple[int, int]) -> None:
         self.fields[move[0]][move[1]] = self.first_player if self.is_first_player else self.second_player
@@ -84,7 +83,7 @@ class Board:
                 field = self.fields[x][y]
                 hash_value = 3 * hash_value + (1 if field == self.first_player else 2 if field == self.second_player else 0)
 
-        return hash_value % PRIME
+        return hash_value
 
 
 def negamax(node, alpha, beta) -> Tuple[int, Any]:
