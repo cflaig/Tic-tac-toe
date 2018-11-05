@@ -110,7 +110,7 @@ def negamax(node, alpha, beta) -> Tuple[int, Any]:
         alpha = max(alpha, value)
 
         if alpha >= beta:
-            break
+            return best
 
     node.transposition_table[node.get_hash()] = best
     return best
