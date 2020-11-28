@@ -17,7 +17,6 @@ class Gui:
         window.setWindowTitle('Tic tac toe')
         self._layout = QGridLayout(window)
         self._create_buttons()
-
         window.show()
         app.exec()
 
