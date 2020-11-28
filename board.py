@@ -31,6 +31,13 @@ class Board:
         self.past_moves = []
         self.verbose = verbose
 
+        r = list(range(board_size))
+        self.sorted_range = []
+        while len(r) > 0:
+            self.sorted_range.append(r.pop())
+            if len(r) > 0:
+                self.sorted_range.append(r.pop(0))
+        self.sorted_range.reverse()
         self.sorted_range = list(range(board_size))
 
     def move(self, move: Tuple[int, int]) -> None:
