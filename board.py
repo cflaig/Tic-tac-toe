@@ -32,7 +32,7 @@ class Board:
         self.fields = [['' for _ in range(self.board_size + 1)] for _ in range(self.board_size + 1)]
         self.is_first_player = True
         self.past_moves = []
-        self.table_size = min(3**(board_size**2), 2**hash_table_size -1 )
+        self.table_size = min(3**(board_size**2), 2**hash_table_size - 1)
         self.transposition_table = [None for _ in range(self.table_size)]
         self.verbose = verbose
         if verbose > 0:
@@ -76,8 +76,17 @@ class Board:
             if max(down_right_count, down_left_count, vertical, horizontal) >= self.required_for_winning\
             else 0
 
-    def possible_moves(self) -> List[Tuple[int, int]]:
-        return [(x, y) for x in self.sorted_range for y in self.sorted_range if self.fields[x][y] == '']
+    def possible_moves(self, move: Tuple[int, int]) -> List[Tuple[int, int]]:
+        if move is None:
+            return [(x, y) for x in self.sorted_range for y in self.sorted_range if self.fields[x][y] == '']
+
+        moves = [move]
+        mx, my = move
+        for x in self.sorted_range:
+            for y in self.sorted_range:
+                if self.fields[x][y] == '' and (mx != x or my != y):
+                    moves.append((x, y))
+        return moves
 
     def count_symbol(self, x: int, y: int, x_step: int, y_step: int, symbol: str):
         count: int = 0
@@ -115,19 +124,34 @@ class Board:
         return (1009*value % self.table_size, value)
 
 
+EXACT = 0
+LOWER_BOUND = 1
+UPPER_BOUND = 2
+
+
 def negamax(node, alpha, beta, depth, debug_depth) -> Tuple[int, Any]:
+    alpha_orig = alpha
     hash_value, pos = node.get_hash()
     tmp = node.transposition_table[hash_value]
+    move = None
 
-    if tmp is not None and tmp[1] == pos:
-        return tmp[0]
+    if tmp is not None and tmp[2] == pos:
         flag = tmp[1]
+        value, move = tmp[0]
+        if flag == EXACT:
+            return tmp[0]
+        elif flag == LOWER_BOUND:
+            alpha = max(alpha, value)
+        elif flag == UPPER_BOUND:
+            beta = min(beta, value)
+        if alpha >= beta:
+            return tmp[0]
 
     score = node.score()
     if score >= WON / 10:
         return -score, None
 
-    possible_moves: List = node.possible_moves()
+    possible_moves: List = node.possible_moves(move)
 
     if not possible_moves:
         return 0, None
@@ -142,7 +166,16 @@ def negamax(node, alpha, beta, depth, debug_depth) -> Tuple[int, Any]:
             best = value, move
             alpha = max(value, alpha)
             if alpha >= beta:
-                return best
+                break;
 
-    node.transposition_table[hash_value] = (best, pos)
+    if best[0] < alpha_orig:
+        flag = UPPER_BOUND
+        move_value = best[0]
+    elif best[0] >= beta:
+        flag = LOWER_BOUND
+        move_value = best[0]
+    else:
+        flag = EXACT
+        move_value = best[0]
+    node.transposition_table[hash_value] = ((move_value, best[1]), flag, pos)
     return best
