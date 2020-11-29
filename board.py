@@ -14,13 +14,16 @@ class Board:
     is_first_player: bool
     past_moves: List[Tuple[int, int]]
     num_evaluations: int
+    transposition_table: List
     sorted_range: List[int]
+    table_size: int
     verbose: int
 
     def __init__(self, first_player: str,
                  second_player: str,
                  board_size: int = 3,
                  required_for_winning: int = 3,
+                 hash_table_size: int = 19,
                  verbose: int = 0):
         self.first_player = first_player
         self.second_player = second_player
@@ -29,7 +32,11 @@ class Board:
         self.fields = [['' for _ in range(self.board_size + 1)] for _ in range(self.board_size + 1)]
         self.is_first_player = True
         self.past_moves = []
+        self.table_size = min(3**(board_size**2), 2**hash_table_size -1 )
+        self.transposition_table = [None for _ in range(self.table_size)]
         self.verbose = verbose
+        if verbose > 0:
+            print("transposition count: " + str(len(self.transposition_table)))
 
         r = list(range(board_size))
         self.sorted_range = []
@@ -84,6 +91,8 @@ class Board:
 
     def cpu_move(self):
         self.num_evaluations = 0
+        if self.verbose > 0:
+            print("hash of actual board: " + str(self.get_hash()))
 
         value, move = negamax(self, -INF, INF, 0, 3)
         if self.verbose > 0:
@@ -92,10 +101,28 @@ class Board:
             self.move(move)
             if self.verbose > 0:
                 print("number moves: " + str(self.num_evaluations))
+                print("hash: " + str(self.get_hash()))
+                print("hash: " + str(self.transposition_table[self.get_hash()[0]]))
         return self.num_evaluations
+
+    def get_hash(self) -> (int, int):
+        value = 0
+        for x in range(self.board_size):
+            for y in range(self.board_size):
+                field = self.fields[x][y]
+                value = value * 3 + (1 if field == self.first_player else (2 if field == self.second_player else 0))
+
+        return (1009*value % self.table_size, value)
 
 
 def negamax(node, alpha, beta, depth, debug_depth) -> Tuple[int, Any]:
+    hash_value, pos = node.get_hash()
+    tmp = node.transposition_table[hash_value]
+
+    if tmp is not None and tmp[1] == pos:
+        return tmp[0]
+        flag = tmp[1]
+
     score = node.score()
     if score >= WON / 10:
         return -score, None
@@ -115,5 +142,7 @@ def negamax(node, alpha, beta, depth, debug_depth) -> Tuple[int, Any]:
             best = value, move
             alpha = max(value, alpha)
             if alpha >= beta:
-                break
+                return best
+
+    node.transposition_table[hash_value] = (best, pos)
     return best
